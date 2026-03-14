@@ -1,0 +1,504 @@
+{
+  "common": {
+    "na": "N/A"
+  },
+  "navigation": {
+    "root": {
+      "modules": "Modules",
+      "profile": "Profil"
+    },
+    "modules": {
+      "homeTitle": "Modules",
+      "quizTitle": "Quiz"
+    },
+    "profile": {
+      "homeTitle": "Profil",
+      "editTitle": "Modifier mes informations",
+      "exportTitle": "Exporter mon rapport"
+    }
+  },
+  "auth": {
+    "tabLogin": "Connexion",
+    "tabRegister": "Inscription",
+    "heroEyebrow": "AUTH",
+    "secureAccountTitle": "Creer un compte securise",
+    "secureLoginTitle": "Connexion securisee",
+    "registerBody": "Activez votre espace personnel pour suivre vos evaluations et votre progression.",
+    "loginBody": "Connectez-vous pour reprendre vos modules et verifier vos acquis en continu.",
+    "fullName": "Nom complet",
+    "yourName": "Votre nom",
+    "email": "Adresse email",
+    "emailPlaceholder": "prenom.nom@entreprise.com",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "Minimum 8 caracteres",
+    "confirmPassword": "Confirmer le mot de passe",
+    "confirmPasswordPlaceholder": "Saisissez a nouveau",
+    "keepSession": "Maintenir la session active",
+    "securityEyebrow": "SECURITE",
+    "securityBody": "Mot de passe fort requis et verification en deux etapes disponible apres activation.",
+    "createAccount": "Creer mon compte",
+    "signIn": "Se connecter",
+    "loginError": "Connexion impossible. Verifiez votre backend."
+  },
+  "modules": {
+    "heroEyebrow": "ATELIER CYBER",
+    "heroTitle": "Parcours de sensibilisation",
+    "heroBody": "Continuez votre progression et validez vos acquis avec les quiz.",
+    "lessons": "Lecons",
+    "quizzes": "Quiz",
+    "progress": "Progression",
+    "loading": "Chargement des modules...",
+    "loadError": "Chargement des modules impossible.",
+    "availableModules": "Modules disponibles",
+    "courseCount_one": "{{count}} cours",
+    "courseCount_other": "{{count}} cours",
+    "quizCount_one": "{{count}} quiz",
+    "quizCount_other": "{{count}} quiz",
+    "moduleProgress": "Progression: {{value}}%",
+    "coursePanelEyebrow": "COURS DU MODULE",
+    "courseMeta": "{{available}} disponibles • {{read}} lus • {{completed}} termines",
+    "startCourse": "Commencer",
+    "quizPanelEyebrow": "QUIZ DU MODULE",
+    "quizMeta": "{{available}} quiz disponibles • {{completed}} termines",
+    "quizUnlockHint_one": "Terminez tous les cours du module pour activer les quiz ({{count}} restant).",
+    "quizUnlockHint_other": "Terminez tous les cours du module pour activer les quiz ({{count}} restants).",
+    "alreadyCompleted": "Deja termine",
+    "locked": "Verrouille",
+    "resumeQuiz": "Reprendre",
+    "startQuiz": "Lancer"
+  },
+  "course": {
+    "heroEyebrow": "COURS",
+    "moduleLabel": "Module: {{moduleTitle}}",
+    "status": {
+      "completed": "Cours termine",
+      "inProgress": "Cours en cours",
+      "ready": "Pret a commencer"
+    },
+    "loadError": "Impossible de charger ce cours.",
+    "fallbackObjective": "Objectif indisponible car le backend est inaccessible.",
+    "loading": "Chargement du cours...",
+    "reference": "Reference",
+    "format": "Format",
+    "duration": "Duree",
+    "objectiveEyebrow": "OBJECTIF PEDAGOGIQUE",
+    "objectiveUnavailable": "Objectif indisponible.",
+    "timelineEyebrow": "PARCOURS DU COURS",
+    "stepMeta": "Etape {{current}} sur {{total}}",
+    "completedEyebrow": "COURS TERMINE",
+    "completedBody": "Vous avez parcouru toutes les etapes de {{courseTitle}}. Vous pouvez maintenant passer au quiz du module avec une base complete.",
+    "review": "Revoir le cours",
+    "nextCourse": "Aller au cours suivant: {{code}}",
+    "development": "Developpement",
+    "takeaway": "A retenir",
+    "previous": "Precedent",
+    "finishCourse": "Terminer le cours",
+    "nextStep": "Etape suivante",
+    "startEyebrow": "DEMARRAGE",
+    "startBody": "Le cours n a pas encore commence. Appuyez sur le bouton ci-dessous pour lancer le parcours anime et suivre les etapes une a une.",
+    "start": "Commencer le cours",
+    "sections": {
+      "S1": {
+        "label": "Introduction",
+        "title": "Pourquoi {{courseTitleLower}} est important",
+        "body": "Cette partie pose le contexte du module {{moduleTitleLower}} et explique pourquoi ce sujet revient dans les situations numeriques du quotidien.",
+        "development": [
+          "Dans la pratique, {{courseTitleLower}} ne concerne pas uniquement les experts. Chaque utilisateur est confronte a des decisions simples mais sensibles: ouvrir un lien, partager une information, installer un outil ou repondre a une demande urgente.",
+          "Le but de cette introduction est de montrer que le risque apparait souvent dans des situations ordinaires. Plus le contexte semble banal, plus il est facile d agir trop vite. C est justement pour cela que ce cours insiste sur les bons reflexes avant l action.",
+          "En comprenant pourquoi ce sujet est important, vous pouvez relier le contenu du cours a vos usages quotidiens et mieux anticiper les erreurs frequentes."
+        ],
+        "takeaway": [
+          "{{objective}}",
+          "Le module {{moduleTitleLower}} repond a des situations reelles que l on peut rencontrer en ligne.",
+          "Comprendre le contexte permet de mieux reconnaitre le risque avant d agir."
+        ]
+      },
+      "S2": {
+        "label": "Observation",
+        "title": "Identifier les signaux utiles",
+        "body": "Vous observez ici les indices concrets a reperer avant d agir: contexte, niveau de risque, information demandee et bonne posture a adopter.",
+        "development": [
+          "Observer une situation numerique signifie prendre quelques secondes pour analyser ce qui se passe reellement. Qui vous contacte ? Que demande-t-on exactement ? Pourquoi maintenant ? Ces trois questions suffisent souvent a faire apparaitre une incoherence ou une tentative de pression.",
+          "Un message frauduleux cherche souvent a provoquer une reaction rapide: peur, curiosite, urgence ou confiance excessive. Le bon reflexe consiste a ralentir, verifier la source et comparer la demande avec ce qui est habituel dans votre environnement.",
+          "Cette phase d observation est essentielle car elle evite de repondre de facon automatique. Elle transforme une intuition floue en verification concrete."
+        ],
+        "takeaway": [
+          "Avant toute action, verifier l intention du message et la source.",
+          "Se demander quelles donnees sont demandees ou potentiellement exposees.",
+          "Un doute doit ralentir la decision, jamais accelerer le clic."
+        ]
+      },
+      "S3": {
+        "label": "Pratique",
+        "title": "Mettre en application avec des cas reels",
+        "body": "Le cours transforme les notions en reflexes pratiques avec des exemples simples: que faire, quoi eviter, quand demander de l aide.",
+        "development": [
+          "La mise en pratique consiste a traduire les principes vus plus haut en actions concretes. Face a un doute, il faut savoir choisir entre verifier, ignorer, signaler ou demander une validation. Cette decision doit etre simple, reproductible et facile a memoriser.",
+          "Les cas reels ont pour objectif de montrer qu une bonne reponse n est pas toujours technique. Souvent, la meilleure action est organisationnelle: ne pas cliquer, passer par un canal connu, demander une confirmation ou transmettre l information a la bonne personne.",
+          "Avec l entrainement, ces choix deviennent des automatismes. Le cours cherche donc moins a faire apprendre une liste par coeur qu a installer une methode de decision fiable."
+        ],
+        "takeaway": [
+          "La meilleure defense vient souvent d une decision simple prise au bon moment.",
+          "Ignorer, verifier ou demander de l aide est parfois plus utile que repondre.",
+          "Les bons reflexes se construisent avec des actions repetables et faciles a memoriser."
+        ]
+      },
+      "S4": {
+        "label": "Validation",
+        "title": "Retenir la checklist finale",
+        "body": "Cette derniere etape consolide les acquis avant le quiz en resumant les actions prioritaires et les erreurs a ne plus reproduire.",
+        "development": [
+          "Avant de terminer, il est utile de reformuler les etapes essentielles sous forme de checklist mentale. Une checklist efficace doit rester courte: observer, verifier, evaluer le risque, puis agir de facon prudente. Si une situation reste confuse, il vaut mieux demander une aide complementaire.",
+          "La validation permet aussi d identifier les erreurs classiques a eviter: cliquer trop vite, faire confiance a une apparence rassurante, partager une information sans controle ou ignorer un signal d alerte pourtant visible.",
+          "Cette synthese finale prepare directement au quiz. Elle vous aide a passer d une comprehension passive du cours a une capacite de reponse active face a des scenarios concrets."
+        ],
+        "takeaway": [
+          "Observer la situation avant de cliquer ou de partager une information.",
+          "Verifier la source, la demande et le niveau de risque.",
+          "Agir prudemment puis valider les acquis avec le quiz du module."
+        ]
+      }
+    }
+  },
+  "quiz": {
+    "heroEyebrow": "QUIZ",
+    "heroBody": "Repondez aux questions pour mesurer votre niveau sur les reflexes cyber essentiels.",
+    "loading": "Chargement du quiz...",
+    "loadError": "Chargement du quiz impossible.",
+    "localDataUsed": "Donnees locales utilisees.",
+    "processedQuestions": "Questions traitees",
+    "correctAnswers": "Bonnes reponses",
+    "overallProgress": "Progression globale: {{value}}%",
+    "finalResultEyebrow": "RESULTAT FINAL",
+    "resultBody_one": "Vous avez obtenu {{score}} bonne reponse sur {{total}}.",
+    "resultBody_other": "Vous avez obtenu {{score}} bonnes reponses sur {{total}}.",
+    "syncSubmitting": "Synchronisation du resultat en cours...",
+    "syncSubmitted": "Resultat enregistre: {{score}}/{{total}} ({{rate}}%)",
+    "syncError": "Echec de synchronisation du resultat sur le backend.",
+    "syncLoginRequired": "Connectez-vous pour enregistrer ce resultat dans le backend.",
+    "nextQuiz": "Aller au quiz suivant: {{code}}",
+    "restart": "Recommencer le quiz",
+    "correctAnswerTitle": "Bonne reponse",
+    "wrongAnswerTitle": "Mauvaise reponse",
+    "chooseAnswer": "Choisissez une reponse",
+    "readExplanation": "Lisez l explication puis continuez",
+    "showResult": "Voir mon resultat",
+    "nextQuestion": "Question suivante",
+    "noQuestion": "Aucune question disponible pour ce quiz.",
+    "answerExplanation": {
+      "correct": "Bonne reponse. \"{{correctOption}}\" est correcte car elle correspond au bon reflexe de cybersecurite attendu pour cette situation.",
+      "wrong": "Mauvaise reponse. \"{{selectedOption}}\" n est pas la bonne action ici. La bonne reponse est \"{{correctOption}}\" car c est le comportement le plus sur dans ce contexte."
+    },
+    "fallback": {
+      "title": "Quiz {{id}}",
+      "module": "Generique",
+      "prompt": "Ce quiz etait absent. Une version par defaut a ete creee.",
+      "options": ["Continuer", "Revenir plus tard", "Demander une validation"]
+    }
+  },
+  "profile": {
+    "heroEyebrow": "PROFIL",
+    "heroTitle": "Compte utilisateur",
+    "heroBody": "Gerer votre identite, votre progression cyber et vos preferences de suivi.",
+    "loadError": "Chargement du profil impossible.",
+    "loading": "Chargement du profil...",
+    "fallbackUser": "Utilisateur",
+    "fallbackRole": "Apprenant",
+    "fallbackOrganization": "Organisation non renseignee",
+    "progress": "Progression",
+    "completedCourses": "Cours suivis",
+    "completedQuizzes": "Quiz termines",
+    "preferences": "Preferences",
+    "notifications": "Notifications de rappel",
+    "notificationsMeta": "Recevoir les alertes de reprise de module.",
+    "weeklyRecap": "Recap hebdomadaire",
+    "weeklyRecapMeta": "Un resume de vos acquis chaque vendredi.",
+    "quickActions": "Actions rapides",
+    "editProfile": "Modifier mes informations",
+    "exportReport": "Exporter mon rapport",
+    "logout": "Se deconnecter"
+  },
+  "editProfile": {
+    "heroEyebrow": "PROFIL",
+    "heroTitle": "Modifier mes informations",
+    "heroBody": "Mettez a jour vos informations personnelles et professionnelles.",
+    "loadError": "Chargement du profil impossible.",
+    "saveError": "Mise a jour impossible.",
+    "loading": "Chargement du profil...",
+    "fullName": "Nom complet",
+    "fullNamePlaceholder": "Nom complet",
+    "emailReadonly": "Adresse email (lecture seule)",
+    "emailPlaceholder": "prenom.nom@organisation.com",
+    "role": "Role",
+    "rolePlaceholder": "Role",
+    "organization": "Organisation",
+    "organizationPlaceholder": "Organisation",
+    "save": "Enregistrer les modifications"
+  },
+  "exportReport": {
+    "heroEyebrow": "RAPPORT",
+    "heroTitle": "Exporter mon rapport",
+    "heroBody": "Generez un rapport de progression et de quiz selon la periode souhaitee.",
+    "format": "Format",
+    "period": "Periode",
+    "period7": "7 jours",
+    "period30": "30 jours",
+    "period90": "90 jours",
+    "previewEyebrow": "APERCU",
+    "previewMeta": "Inclut la progression modules, l historique quiz et les scores moyens.",
+    "export": "Exporter le rapport",
+    "exportError": "Export impossible.",
+    "filePrefix": "Rapport",
+    "fileName": "Fichier: {{name}}",
+    "attempts": "Tentatives: {{count}}",
+    "averageRate": "Taux moyen: {{rate}}%"
+  },
+  "quizCatalog": {
+    "Q1": {
+      "title": "Maitre des Mots de Passe",
+      "module": "Cyber Heros",
+      "questions": [
+        {
+          "id": "Q1-1",
+          "module": "Mots de passe",
+          "prompt": "Quel mot de passe est le plus amusant et securise ?",
+          "options": ["password", "LicorneMagique2024!", "12345"],
+          "correctIndex": 1
+        },
+        {
+          "id": "Q1-2",
+          "module": "Mots de passe",
+          "prompt": "Quelle pratique est explicitement deconseillee dans le jeu ?",
+          "options": ["Ne jamais partager son mot de passe", "Ecrire son mot de passe sur un post-it visible", "Creer des mots de passe differents selon les services"],
+          "correctIndex": 1
+        },
+        {
+          "id": "Q1-3",
+          "module": "Mots de passe",
+          "prompt": "Quel mot de passe est le plus faible ?",
+          "options": ["SoleilBleu#2026", "azerty", "ChatRouge!84"],
+          "correctIndex": 1
+        },
+        {
+          "id": "Q1-4",
+          "module": "Mots de passe",
+          "prompt": "Pourquoi faut-il utiliser des mots de passe differents selon les sites ?",
+          "options": ["Pour empecher qu un seul piratage compromette tous les comptes", "Pour aller plus vite a la connexion", "Pour aider les amis a s en souvenir"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q1-5",
+          "module": "Mots de passe",
+          "prompt": "Quel element rend un mot de passe plus robuste ?",
+          "options": ["Une combinaison de lettres, chiffres et symboles", "Seulement le prenom", "Le meme code PIN que sur le telephone"],
+          "correctIndex": 0
+        }
+      ]
+    },
+    "Q2": {
+      "title": "Detecteur de Pieges",
+      "module": "Cyber Heros",
+      "questions": [
+        {
+          "id": "Q2-1",
+          "module": "Phishing",
+          "prompt": "Quel indice est cite comme signal de phishing dans le document ?",
+          "options": ["Adresse suspecte et urgence exageree", "Message courtois sans lien", "Email interne attendu"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q2-2",
+          "module": "Phishing",
+          "prompt": "Dans Detecteur de Pieges, que fait le joueur ?",
+          "options": ["Il choisit si le message est sur ou suspect", "Il installe un antivirus sur serveur", "Il change ses droits administrateur"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q2-3",
+          "module": "Phishing",
+          "prompt": "Quel message doit sembler suspect ?",
+          "options": ["Tu as gagne un cadeau, clique vite ici", "Voici le devoir pour demain", "Rendez-vous confirme a 15h"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q2-4",
+          "module": "Phishing",
+          "prompt": "Que faut-il verifier dans un email douteux ?",
+          "options": ["L adresse de l expediteur", "La couleur de l ecran", "Le niveau de batterie"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q2-5",
+          "module": "Phishing",
+          "prompt": "Quelle reaction est la plus sure face a un lien suspect ?",
+          "options": ["Ne pas cliquer et demander de l aide", "Cliquer pour voir si c est vrai", "Envoyer le lien a tous ses amis"],
+          "correctIndex": 0
+        }
+      ]
+    },
+    "Q3": {
+      "title": "Le Royaume des Mots de Passe",
+      "module": "Protection des comptes",
+      "questions": [
+        {
+          "id": "Q3-1",
+          "module": "Construction de mot de passe",
+          "prompt": "Combien d etapes composent la quete du Royaume des Mots de Passe ?",
+          "options": ["3 etapes", "6 etapes", "10 etapes"],
+          "correctIndex": 1
+        },
+        {
+          "id": "Q3-2",
+          "module": "Construction de mot de passe",
+          "prompt": "Quel mecanisme est present dans ce jeu pour evaluer la qualite du mot de passe ?",
+          "options": ["Une jauge de securite dynamique", "Un scan reseau en temps reel", "Un pare-feu materiel"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q3-3",
+          "module": "Construction de mot de passe",
+          "prompt": "Quelle suite fait partie de la quete selon le document ?",
+          "options": ["animal, couleur, melodie, chiffres, symboles", "ville, pays, continent", "email, telephone, adresse"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q3-4",
+          "module": "Construction de mot de passe",
+          "prompt": "Quel bonus peut etre gagne dans les mini-jeux ?",
+          "options": ["Un caractere special supplementaire", "Un acces administrateur", "La suppression du mot de passe"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q3-5",
+          "module": "Construction de mot de passe",
+          "prompt": "A la fin du jeu, que peut voir le joueur ?",
+          "options": ["Le mot de passe final avec un certificat", "Une liste de serveurs reseau", "Les mots de passe des autres joueurs"],
+          "correctIndex": 0
+        }
+      ]
+    },
+    "Q4": {
+      "title": "Chat Guardian",
+      "module": "Messagerie securisee",
+      "questions": [
+        {
+          "id": "Q4-1",
+          "module": "Messagerie",
+          "prompt": "Quel type de situation fait partie des scenarios Chat Guardian ?",
+          "options": ["Arnaque au faux concours avec demande de code SMS", "Configuration d un routeur entreprise", "Mise a jour d une base SQL"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q4-2",
+          "module": "Messagerie",
+          "prompt": "Quelle action est proposee dans le jeu face a un contact dangereux ?",
+          "options": ["Bloquer ou signaler le contact", "Partager son numero pour verifier", "Ignorer les preuves et supprimer le chat"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q4-3",
+          "module": "Messagerie",
+          "prompt": "Quel scenario est cite dans Chat Guardian ?",
+          "options": ["Cyberharcelement avec insultes et menaces", "Installation d imprimante", "Configuration du Wi-Fi"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q4-4",
+          "module": "Messagerie",
+          "prompt": "Que faut-il faire si un message met mal a l aise ?",
+          "options": ["Demander de l aide a un adulte", "Continuer la discussion en secret", "Envoyer une photo en reponse"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q4-5",
+          "module": "Messagerie",
+          "prompt": "Quel indice est un signal d alerte dans une conversation ?",
+          "options": ["Une demande de secret ou de photo", "Un ami qui dit bonjour", "Une invitation a faire ses devoirs"],
+          "correctIndex": 0
+        }
+      ]
+    },
+    "Q5": {
+      "title": "Le Labyrinthe des Infos",
+      "module": "Protection des donnees personnelles",
+      "questions": [
+        {
+          "id": "Q5-1",
+          "module": "Donnees personnelles",
+          "prompt": "Quel element fait partie des mecaniques du Labyrinthe des Infos ?",
+          "options": ["Inventaire des donnees sensibles protegees/compromises", "Compilation de code en temps reel", "Mode multijoueur en equipe reseau"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q5-2",
+          "module": "Donnees personnelles",
+          "prompt": "Quel bilan final peut apparaitre dans ce jeu ?",
+          "options": ["Maitre de la cybersecurite", "Administrateur systeme certifie", "Root kernel valide"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q5-3",
+          "module": "Donnees personnelles",
+          "prompt": "Combien de vies le joueur a-t-il au depart ?",
+          "options": ["5", "2", "10"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q5-4",
+          "module": "Donnees personnelles",
+          "prompt": "Quelle situation est presentee dans le labyrinthe ?",
+          "options": ["Un faux concours iPhone", "Une mise a jour BIOS", "Une panne de clavier"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q5-5",
+          "module": "Donnees personnelles",
+          "prompt": "Quelle donnee faut-il proteger dans ce jeu ?",
+          "options": ["Adresse et numero de telephone", "Couleur preferee seulement", "Nom du dessin anime prefere"],
+          "correctIndex": 0
+        }
+      ]
+    },
+    "Q6": {
+      "title": "Firewall Defender",
+      "module": "Defense active",
+      "questions": [
+        {
+          "id": "Q6-1",
+          "module": "Protection active",
+          "prompt": "Quel est le role du joueur dans Firewall Defender ?",
+          "options": ["Deplacer un coffre pour proteger les donnees", "Programmer un serveur DNS", "Configurer un VPN entreprise"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q6-2",
+          "module": "Protection active",
+          "prompt": "Que se passe-t-il si une menace est attrapee ou qu une donnee va au pirate ?",
+          "options": ["Le bouclier diminue et peut faire perdre une vie", "Le score est double automatiquement", "Le niveau suivant se debloque"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q6-3",
+          "module": "Protection active",
+          "prompt": "Quel objet peut tomber du ciel dans Firewall Defender ?",
+          "options": ["Des donnees personnelles", "Des voitures de course", "Des livres scolaires"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q6-4",
+          "module": "Protection active",
+          "prompt": "Quel bonus est mentionne dans le document ?",
+          "options": ["Bouclier ou vie supplementaire via 2FA", "Acces root permanent", "Suppression totale des menaces"],
+          "correctIndex": 0
+        },
+        {
+          "id": "Q6-5",
+          "module": "Protection active",
+          "prompt": "Que doit faire le joueur pendant toute la partie ?",
+          "options": ["Agir vite et proteger les donnees", "Attendre sans bouger", "Donner les donnees au pirate"],
+          "correctIndex": 0
+        }
+      ]
+    }
+  }
+}

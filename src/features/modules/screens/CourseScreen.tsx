@@ -1,0 +1,664 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ActivityIndicator, Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { getApiBaseUrl, getCourseByCode, getModules } from '../../../lib/api';
+import { markCourseCompleted, markCourseRead } from '../../../lib/learningProgress';
+import { ModulesStackParamList } from '../../../navigation/types';
+import { colors } from '../../../theme/colors';
+import { typography } from '../../../theme/typography';
+import {useTranslation} from "react-i18next"
+
+type CourseScreenProps = {
+  userId: string;
+};
+
+type CourseSection = {
+  id: string;
+  label: string;
+  title: string;
+  body: string;
+  development: string[];
+  takeaway: string[];
+};
+
+function buildCourseSections(
+  t: (key: string, options?: Record<string, unknown>) => unknown,
+  moduleTitle: string,
+  courseTitle: string,
+  objective: string
+): CourseSection[] {
+  const sectionIds = ['S1', 'S2', 'S3', 'S4'];
+
+  return sectionIds.map((sectionId) => ({
+    id: sectionId,
+    label: t(`course.sections.${sectionId}.label`) as string,
+    title: t(`course.sections.${sectionId}.title`, {
+      courseTitleLower: courseTitle.toLowerCase(),
+    }) as string,
+    body: t(`course.sections.${sectionId}.body`, {
+      moduleTitleLower: moduleTitle.toLowerCase(),
+    }) as string,
+    development: t(`course.sections.${sectionId}.development`, {
+      moduleTitleLower: moduleTitle.toLowerCase(),
+      courseTitleLower: courseTitle.toLowerCase(),
+      returnObjects: true,
+    }) as string[],
+    takeaway: t(`course.sections.${sectionId}.takeaway`, {
+      objective,
+      moduleTitleLower: moduleTitle.toLowerCase(),
+      returnObjects: true,
+    }) as string[],
+  }));
+}
+
+export function CourseScreen({ userId }: CourseScreenProps) {
+  const { t } = useTranslation();
+
+  const tCourse = useCallback(
+    (key: string, options?: Record<string, unknown>) => t(`course.${key}`, options) as string,
+    [t]
+  );
+
+  const tCommon = useCallback(
+    (key: string, options?: Record<string, unknown>) => t(`common.${key}`, options) as string,
+    [t]
+  );
+
+  const navigation = useNavigation<NativeStackNavigationProp<ModulesStackParamList>>();
+  const route = useRoute<RouteProp<ModulesStackParamList, 'CourseDetails'>>();
+  const { courseCode, courseTitle, moduleTitle, autoStart } = route.params;
+
+  const [courseStarted, setCourseStarted] = useState(Boolean(autoStart));
+  const [currentStep, setCurrentStep] = useState(0);
+  const [courseCompleted, setCourseCompleted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [courseData, setCourseData] = useState<{
+    title: string;
+    moduleTitle: string;
+    format: string;
+    duration: string;
+    objective: string;
+  } | null>(null);
+  const [nextCourse, setNextCourse] = useState<{ code: string; title: string; moduleTitle: string } | null>(null);
+
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const translateAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadCourse() {
+      setIsLoading(true);
+      setErrorMessage(null);
+
+      try {
+        const [course, modules] = await Promise.all([getCourseByCode(courseCode), getModules()]);
+        if (!isMounted) {
+          return;
+        }
+
+        setCourseData({
+          title: course.title,
+          moduleTitle: course.module.title,
+          format: course.format,
+          duration: course.duration,
+          objective: course.objective,
+        });
+
+        const selectedModule = modules.find((moduleItem) => moduleItem.code === course.module.code);
+        if (!selectedModule) {
+          setNextCourse(null);
+          return;
+        }
+
+        const orderedCourses = [...selectedModule.courses].sort((first, second) =>
+          first.code.localeCompare(second.code, undefined, { numeric: true, sensitivity: 'base' })
+        );
+
+        const currentCourseIndex = orderedCourses.findIndex((item) => item.code === course.code);
+        const followingCourse = currentCourseIndex >= 0 ? orderedCourses[currentCourseIndex + 1] : undefined;
+
+        setNextCourse(
+          followingCourse
+            ? {
+                code: followingCourse.code,
+                title: followingCourse.title,
+                moduleTitle: selectedModule.title,
+              }
+            : null
+        );
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        const message = error instanceof Error ? error.message : tCourse('loadError');
+        setErrorMessage(`${message} (API: ${getApiBaseUrl()})`);
+        setCourseData({
+          title: courseTitle ?? courseCode,
+          moduleTitle: moduleTitle ?? 'Module',
+          format: tCommon('na'),
+          duration: tCommon('na'),
+          objective: tCourse('fallbackObjective'),
+        });
+        setNextCourse(null);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadCourse();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [courseCode, courseTitle, moduleTitle, tCourse, tCommon]);
+
+  const sections = useMemo(
+    () =>
+      buildCourseSections(
+        t,
+        courseData?.moduleTitle ?? moduleTitle ?? 'Module',
+        courseData?.title ?? courseTitle ?? courseCode,
+        courseData?.objective ?? tCourse('objectiveUnavailable')
+      ),
+    [courseCode, courseData, courseTitle, moduleTitle, t, tCourse]
+  );
+  const activeSection = sections[currentStep];
+  const progress = Math.round(((currentStep + (courseStarted ? 1 : 0)) / sections.length) * 100);
+
+  useEffect(() => {
+    if (!courseStarted || courseCompleted) {
+      return;
+    }
+
+    fadeAnim.setValue(0);
+    translateAnim.setValue(16);
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 280,
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateAnim, {
+        toValue: 0,
+        duration: 280,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [courseCompleted, courseStarted, currentStep, fadeAnim, translateAnim]);
+
+  useEffect(() => {
+    if (!courseStarted) {
+      return;
+    }
+
+    void markCourseRead(courseCode, userId);
+  }, [courseCode, courseStarted, userId]);
+
+  const startCourse = () => {
+    void markCourseRead(courseCode, userId);
+    setCourseStarted(true);
+    setCourseCompleted(false);
+    setCurrentStep(0);
+  };
+
+  const goToNextStep = () => {
+    if (currentStep === sections.length - 1) {
+      void markCourseCompleted(courseCode, userId);
+      setCourseCompleted(true);
+      return;
+    }
+
+    setCurrentStep((prev) => prev + 1);
+  };
+
+  const goToPreviousStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep((prev) => prev - 1);
+    }
+  };
+
+  const restartCourse = () => {
+    setCourseCompleted(false);
+    setCurrentStep(0);
+    setCourseStarted(true);
+  };
+
+  const goToNextCourse = () => {
+    if (!nextCourse) {
+      return;
+    }
+
+    navigation.push('CourseDetails', {
+      courseCode: nextCourse.code,
+      courseTitle: nextCourse.title,
+      moduleTitle: nextCourse.moduleTitle,
+      autoStart: true,
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingWrap}>
+        <ActivityIndicator color={colors.accent} />
+        <Text style={styles.loadingText}>{tCourse('loading')}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <View style={styles.heroCard}>
+        <Text style={typography.eyebrow}>{tCourse('heroEyebrow')}</Text>
+        <Text style={[typography.screenTitle, styles.title]}>{courseData?.title ?? courseTitle ?? courseCode}</Text>
+        <Text style={[typography.body, styles.body]}>
+          {tCourse('moduleLabel', {
+            moduleTitle: courseData?.moduleTitle ?? moduleTitle ?? 'Module',
+          })}
+        </Text>
+        <View style={styles.statusChip}>
+          <Text style={styles.statusChipText}>
+            {courseCompleted
+              ? tCourse('status.completed')
+              : courseStarted
+                ? tCourse('status.inProgress')
+                : tCourse('status.ready')}
+          </Text>
+        </View>
+        {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+      </View>
+
+      <View style={styles.metaRow}>
+        <View style={styles.metaCard}>
+          <Text style={typography.statValue}>{courseCode}</Text>
+          <Text style={[typography.statLabel, styles.statLabel]}>{tCourse('reference')}</Text>
+        </View>
+        <View style={styles.metaCard}>
+          <Text style={typography.statValue}>{courseData?.format ?? tCommon('na')}</Text>
+          <Text style={[typography.statLabel, styles.statLabel]}>{tCourse('format')}</Text>
+        </View>
+        <View style={styles.metaCard}>
+          <Text style={typography.statValue}>{courseData?.duration ?? tCommon('na')}</Text>
+          <Text style={[typography.statLabel, styles.statLabel]}>{tCourse('duration')}</Text>
+        </View>
+      </View>
+
+      <View style={styles.sectionCard}>
+        <Text style={typography.eyebrowWarning}>{tCourse('objectiveEyebrow')}</Text>
+        <Text style={styles.sectionBody}>{courseData?.objective ?? tCourse('objectiveUnavailable')}</Text>
+      </View>
+
+      {courseStarted ? (
+        <>
+          <View style={styles.timelineCard}>
+            <View style={styles.timelineHeader}>
+              <Text style={typography.eyebrowWarning}>{tCourse('timelineEyebrow')}</Text>
+              <Text style={styles.timelineMeta}>
+                {tCourse('stepMeta', {
+                  current: Math.min(currentStep + 1, sections.length),
+                  total: sections.length,
+                })}
+              </Text>
+            </View>
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${courseCompleted ? 100 : progress}%` }]} />
+            </View>
+            <View style={styles.sectionPills}>
+              {sections.map((section, index) => (
+                <View key={section.id} style={[styles.sectionPill, index <= currentStep && styles.sectionPillActive]}>
+                  <Text style={[styles.sectionPillText, index <= currentStep && styles.sectionPillTextActive]}>{section.label}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          {courseCompleted ? (
+            <View style={styles.sectionCard}>
+              <Text style={typography.eyebrowWarning}>{tCourse('completedEyebrow')}</Text>
+              <Text style={styles.completionValue}>100%</Text>
+              <Text style={styles.sectionBody}>
+                {tCourse('completedBody', {
+                  courseTitle: courseData?.title ?? courseTitle ?? courseCode,
+                })}
+              </Text>
+              <Pressable style={styles.startButton} onPress={restartCourse}>
+                <Text style={styles.startButtonText}>{tCourse('review')}</Text>
+              </Pressable>
+              {nextCourse ? (
+                <Pressable style={styles.completionNextButton} onPress={goToNextCourse}>
+                  <Text style={styles.completionNextButtonText}>
+                    {tCourse('nextCourse', { code: nextCourse.code })}
+                  </Text>
+                </Pressable>
+              ) : null}
+            </View>
+          ) : (
+            <Animated.View
+              style={[
+                styles.sectionCard,
+                {
+                  opacity: fadeAnim,
+                  transform: [{ translateY: translateAnim }],
+                },
+              ]}
+            >
+              <Text style={typography.eyebrowWarning}>{activeSection.label}</Text>
+              <Text style={styles.stepTitle}>{activeSection.title}</Text>
+              <Text style={styles.sectionBody}>{activeSection.body}</Text>
+
+              <View style={styles.developmentCard}>
+                <Text style={styles.developmentLabel}>{tCourse('development')}</Text>
+                <View style={styles.developmentList}>
+                  {activeSection.development.map((paragraph) => (
+                    <Text key={paragraph} style={styles.developmentBody}>{paragraph}</Text>
+                  ))}
+                </View>
+              </View>
+
+              <View style={styles.keyPointCard}>
+                <Text style={styles.keyPointLabel}>{tCourse('takeaway')}</Text>
+                <View style={styles.takeawayList}>
+                  {activeSection.takeaway.map((item) => (
+                    <View key={item} style={styles.takeawayItem}>
+                      <View style={styles.takeawayBullet} />
+                      <Text style={styles.keyPointBody}>{item}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+
+              <View style={styles.actionsRow}>
+                <Pressable
+                  style={[styles.secondaryButton, currentStep === 0 && styles.secondaryButtonDisabled]}
+                  onPress={goToPreviousStep}
+                  disabled={currentStep === 0}
+                >
+                  <Text style={styles.secondaryButtonText}>{tCourse('previous')}</Text>
+                </Pressable>
+                <Pressable style={styles.startButton} onPress={goToNextStep}>
+                  <Text style={styles.startButtonText}>
+                    {currentStep === sections.length - 1 ? tCourse('finishCourse') : tCourse('nextStep')}
+                  </Text>
+                </Pressable>
+              </View>
+            </Animated.View>
+          )}
+        </>
+      ) : (
+        <View style={styles.sectionCard}>
+          <Text style={typography.eyebrowWarning}>{tCourse('startEyebrow')}</Text>
+          <Text style={styles.sectionBody}>{tCourse('startBody')}</Text>
+          <Pressable style={styles.startButton} onPress={startCourse}>
+            <Text style={styles.startButtonText}>{tCourse('start')}</Text>
+          </Pressable>
+        </View>
+      )}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: colors.background,
+  },
+  content: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 36,
+    gap: 14,
+  },
+  loadingWrap: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: colors.background,
+  },
+  loadingText: {
+    color: colors.textMuted,
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  heroCard: {
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    padding: 18,
+  },
+  title: {
+    marginTop: 8,
+  },
+  body: {
+    marginTop: 10,
+  },
+  errorText: {
+    marginTop: 8,
+    color: '#ffb9b9',
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  statusChip: {
+    marginTop: 10,
+    alignSelf: 'flex-start',
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceSoft,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  statusChipText: {
+    color: colors.text,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  metaRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  metaCard: {
+    flex: 1,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceSoft,
+    padding: 12,
+  },
+  statLabel: {
+    marginTop: 6,
+  },
+  sectionCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    padding: 14,
+    gap: 8,
+  },
+  timelineCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    padding: 14,
+    gap: 12,
+  },
+  timelineHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 10,
+  },
+  timelineMeta: {
+    color: colors.textMuted,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  progressTrack: {
+    height: 8,
+    overflow: 'hidden',
+    borderRadius: 999,
+    backgroundColor: colors.surfaceSoft,
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 999,
+    backgroundColor: colors.accent,
+  },
+  sectionPills: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  sectionPill: {
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceSoft,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  sectionPillActive: {
+    borderColor: colors.accent,
+  },
+  sectionPillText: {
+    color: colors.textMuted,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  sectionPillTextActive: {
+    color: colors.accent,
+  },
+  stepTitle: {
+    color: colors.text,
+    fontSize: 20,
+    fontWeight: '900',
+    letterSpacing: -0.4,
+  },
+  sectionBody: {
+    color: colors.textMuted,
+    fontSize: 14,
+    lineHeight: 21,
+  },
+  keyPointCard: {
+    marginTop: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceSoft,
+    padding: 12,
+    gap: 8,
+  },
+  developmentCard: {
+    marginTop: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceSoft,
+    padding: 12,
+    gap: 8,
+  },
+  developmentLabel: {
+    color: colors.accent,
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
+  },
+  developmentList: {
+    gap: 10,
+  },
+  developmentBody: {
+    color: colors.text,
+    fontSize: 13,
+    lineHeight: 20,
+  },
+  keyPointLabel: {
+    color: colors.warning,
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
+  },
+  takeawayList: {
+    gap: 6,
+  },
+  takeawayItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  takeawayBullet: {
+    marginTop: 6,
+    width: 6,
+    height: 6,
+    borderRadius: 999,
+    backgroundColor: colors.accent,
+  },
+  keyPointBody: {
+    flex: 1,
+    color: colors.text,
+    fontSize: 13,
+    lineHeight: 19,
+  },
+  actionsRow: {
+    marginTop: 4,
+    flexDirection: 'row',
+    gap: 10,
+  },
+  startButton: {
+    flex: 1,
+    borderRadius: 12,
+    backgroundColor: colors.accent,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  startButtonText: {
+    color: colors.background,
+    fontSize: 14,
+    fontWeight: '800',
+    letterSpacing: 0.2,
+  },
+  secondaryButton: {
+    flex: 1,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceSoft,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  secondaryButtonDisabled: {
+    opacity: 0.45,
+  },
+  secondaryButtonText: {
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  completionNextButton: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceSoft,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  completionNextButtonText: {
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  completionValue: {
+    color: colors.accent,
+    fontSize: 42,
+    fontWeight: '900',
+    letterSpacing: -0.8,
+  },
+});
