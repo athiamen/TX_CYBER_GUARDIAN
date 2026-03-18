@@ -1,4 +1,5 @@
-import type { i18n as I18nType, TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
+import { QUIZ_CATALOG_BY_ID } from './quizCatalogData';
 
 export type QuizQuestion = {
   id: string;
@@ -15,13 +16,11 @@ export type QuizDefinition = {
   questions: QuizQuestion[];
 };
 
-export function getOrCreateQuiz(quizId: string | undefined, t: TFunction, i18n: I18nType): QuizDefinition {
+export function getOrCreateQuiz(quizId: string | undefined, t: TFunction): QuizDefinition {
   const fallbackId = quizId ?? 'Q1';
-  const translationKey = `quizCatalog.${fallbackId}`;
+  const quizData = QUIZ_CATALOG_BY_ID[fallbackId];
 
-  if (i18n.exists(translationKey)) {
-    const quizData = t(translationKey, { returnObjects: true }) as Omit<QuizDefinition, 'id'>;
-
+  if (quizData) {
     return {
       id: fallbackId,
       title: quizData.title,

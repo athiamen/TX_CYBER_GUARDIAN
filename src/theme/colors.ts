@@ -1,10 +1,10 @@
 export const colors = {
-  background: '#06131f',
-  surface: '#0b2437',
-  surfaceSoft: '#123149',
-  text: '#e8f1f8',
-  textMuted: '#9fb8cb',
-  accent: '#00d3a7',
-  warning: '#ff9d00',
-  border: '#1f425c',
+  background: '#7edaea',
+  surface: '#2a49d3b9',
+  surfaceSoft: '#1b3e49cd',
+  text: '#fcfcfc',
+  textMuted: '#ffffff',
+  accent: '#ffffff',
+  warning: '#3ee452',
+  border: '#409de4',
 };

@@ -217,8 +217,8 @@ export function ProfileScreen({ token, userId, onLogout }: ProfileScreenProps) {
         <Pressable style={styles.actionButton} onPress={() => navigation.navigate('EditProfile')}>
           <Text style={styles.actionText}>{tProfile('editProfile')}</Text>
         </Pressable>
-        <Pressable style={styles.actionButton} onPress={() => navigation.navigate('ExportReport')}>
-          <Text style={styles.actionText}>{tProfile('exportReport')}</Text>
+        <Pressable style={styles.actionButton} onPress={() => navigation.navigate('AttemptsReport')}>
+          <Text style={styles.actionText}>{tProfile('attemptsReport')}</Text>
         </Pressable>
         <Pressable style={[styles.actionButton, styles.actionDanger]} onPress={onLogout}>
           <Text style={styles.actionDangerText}>{tProfile('logout')}</Text>
@@ -406,5 +406,6 @@ const styles = StyleSheet.create({
     color: '#ffb9b9',
     fontSize: 14,
     fontWeight: '800',
+    textAlign: 'center',
   },
 });

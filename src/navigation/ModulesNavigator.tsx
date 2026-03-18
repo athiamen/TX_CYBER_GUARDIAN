@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { ModulesScreen } from '../features/modules/screens/ModulesScreen';
 import { CourseScreen } from '../features/modules/screens/CourseScreen';
+import { CourseVideoScreen } from '../features/modules/screens/CourseVideoScreen';
 import { QuizScreen } from '../features/quiz/screens/QuizScreen';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
@@ -38,6 +39,12 @@ export function ModulesNavigator({ token, userId }: ModulesNavigatorProps) {
         options={({ route }) => ({ title: route.params.courseTitle ?? route.params.courseCode })}
       >
         {() => <CourseScreen userId={userId} />}
+      </Stack.Screen>
+      <Stack.Screen
+        name="CourseVideo"
+        options={({ route }) => ({ title: route.params.courseTitle ?? route.params.courseCode })}
+      >
+        {() => <CourseVideoScreen />}
       </Stack.Screen>
       <Stack.Screen name="QuizDetails" options={{ title: t('navigation.modules.quizTitle') }}>
         {() => <QuizScreen token={token} userId={userId} />}

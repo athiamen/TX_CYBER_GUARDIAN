@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { ProfileScreen } from '../features/profile/screens/ProfileScreen';
 import { EditProfileScreen } from '../features/profile/screens/EditProfileScreen';
-import { ExportReportScreen } from '../features/profile/screens/ExportReportScreen';
+import { AttemptsReportScreen } from '../features/profile/screens/AttemptsReportScreen';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 import { ProfileStackParamList } from './types';
@@ -37,8 +37,8 @@ export function ProfileNavigator({ token, userId, onLogout }: ProfileNavigatorPr
       <Stack.Screen name="EditProfile" options={{ title: t('navigation.profile.editTitle') }}>
         {() => <EditProfileScreen token={token} />}
       </Stack.Screen>
-      <Stack.Screen name="ExportReport" options={{ title: t('navigation.profile.exportTitle') }}>
-        {() => <ExportReportScreen token={token} />}
+      <Stack.Screen name="AttemptsReport" options={{ title: t('navigation.profile.attemptsReportTitle') }}>
+        {() => <AttemptsReportScreen token={token} />}
       </Stack.Screen>
     </Stack.Navigator>
   );

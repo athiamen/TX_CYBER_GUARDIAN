@@ -47,7 +47,7 @@ function buildAnswerExplanation(
 }
 
 export function QuizScreen({ token, userId }: QuizScreenProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const tQuiz = (key: string, options?: Record<string, unknown>) => t(`quiz.${key}`, options);
 
   const navigation = useNavigation<NativeStackNavigationProp<ModulesStackParamList>>();
@@ -55,7 +55,7 @@ export function QuizScreen({ token, userId }: QuizScreenProps) {
   const requestedQuizId = route.params?.quizId ?? 'Q1';
   const submissionStartedRef = useRef(false);
 
-  const [quizDefinition, setQuizDefinition] = useState<LocalQuiz>(() => getOrCreateQuiz(requestedQuizId, t, i18n));
+  const [quizDefinition, setQuizDefinition] = useState<LocalQuiz>(() => getOrCreateQuiz(requestedQuizId, t));
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -143,7 +143,7 @@ export function QuizScreen({ token, userId }: QuizScreenProps) {
           return;
         }
 
-        const fallbackQuiz = getOrCreateQuiz(requestedQuizId, t, i18n);
+        const fallbackQuiz = getOrCreateQuiz(requestedQuizId, t);
         setQuizDefinition(fallbackQuiz);
         setNextQuiz(null);
         const message = error instanceof Error ? error.message : tQuiz('loadError');
@@ -160,7 +160,7 @@ export function QuizScreen({ token, userId }: QuizScreenProps) {
     return () => {
       isMounted = false;
     };
-  }, [i18n, requestedQuizId, t]);
+  }, [requestedQuizId, t]);
 
   useEffect(() => {
     setCurrentIndex(0);

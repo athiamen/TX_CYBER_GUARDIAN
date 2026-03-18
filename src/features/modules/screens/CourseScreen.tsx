@@ -4,6 +4,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ActivityIndicator, Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { getApiBaseUrl, getCourseByCode, getModules } from '../../../lib/api';
 import { markCourseCompleted, markCourseRead } from '../../../lib/learningProgress';
+import { getCourseSections } from '../data/courseSections';
 import { ModulesStackParamList } from '../../../navigation/types';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
@@ -12,45 +13,6 @@ import {useTranslation} from "react-i18next"
 type CourseScreenProps = {
   userId: string;
 };
-
-type CourseSection = {
-  id: string;
-  label: string;
-  title: string;
-  body: string;
-  development: string[];
-  takeaway: string[];
-};
-
-function buildCourseSections(
-  t: (key: string, options?: Record<string, unknown>) => unknown,
-  moduleTitle: string,
-  courseTitle: string,
-  objective: string
-): CourseSection[] {
-  const sectionIds = ['S1', 'S2', 'S3', 'S4'];
-
-  return sectionIds.map((sectionId) => ({
-    id: sectionId,
-    label: t(`course.sections.${sectionId}.label`) as string,
-    title: t(`course.sections.${sectionId}.title`, {
-      courseTitleLower: courseTitle.toLowerCase(),
-    }) as string,
-    body: t(`course.sections.${sectionId}.body`, {
-      moduleTitleLower: moduleTitle.toLowerCase(),
-    }) as string,
-    development: t(`course.sections.${sectionId}.development`, {
-      moduleTitleLower: moduleTitle.toLowerCase(),
-      courseTitleLower: courseTitle.toLowerCase(),
-      returnObjects: true,
-    }) as string[],
-    takeaway: t(`course.sections.${sectionId}.takeaway`, {
-      objective,
-      moduleTitleLower: moduleTitle.toLowerCase(),
-      returnObjects: true,
-    }) as string[],
-  }));
-}
 
 export function CourseScreen({ userId }: CourseScreenProps) {
   const { t } = useTranslation();
@@ -85,6 +47,8 @@ export function CourseScreen({ userId }: CourseScreenProps) {
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const translateAnim = useRef(new Animated.Value(0)).current;
+  const scrollRef = useRef<ScrollView | null>(null);
+  const objectiveSectionY = useRef(0);
 
   useEffect(() => {
     let isMounted = true;
@@ -158,16 +122,13 @@ export function CourseScreen({ userId }: CourseScreenProps) {
     };
   }, [courseCode, courseTitle, moduleTitle, tCourse, tCommon]);
 
-  const sections = useMemo(
-    () =>
-      buildCourseSections(
-        t,
-        courseData?.moduleTitle ?? moduleTitle ?? 'Module',
-        courseData?.title ?? courseTitle ?? courseCode,
-        courseData?.objective ?? tCourse('objectiveUnavailable')
-      ),
-    [courseCode, courseData, courseTitle, moduleTitle, t, tCourse]
-  );
+  const sections = useMemo(() => {
+    return getCourseSections({
+      moduleTitle: courseData?.moduleTitle ?? moduleTitle ?? 'Module',
+      courseTitle: courseData?.title ?? courseTitle ?? courseCode,
+      objective: courseData?.objective ?? tCourse('objectiveUnavailable'),
+    });
+  }, [courseCode, courseData, courseTitle, moduleTitle, tCourse]);
   const activeSection = sections[currentStep];
   const progress = Math.round(((currentStep + (courseStarted ? 1 : 0)) / sections.length) * 100);
 
@@ -242,6 +203,21 @@ export function CourseScreen({ userId }: CourseScreenProps) {
     });
   };
 
+  const goToCourseVideo = () => {
+    navigation.navigate('CourseVideo', {
+      courseCode,
+      courseTitle: courseData?.title ?? courseTitle,
+      moduleTitle: courseData?.moduleTitle ?? moduleTitle,
+    });
+  };
+
+  const goToReferenceSection = () => {
+    scrollRef.current?.scrollTo({
+      y: Math.max(objectiveSectionY.current - 12, 0),
+      animated: true,
+    });
+  };
+
   if (isLoading) {
     return (
       <View style={styles.loadingWrap}>
@@ -252,7 +228,7 @@ export function CourseScreen({ userId }: CourseScreenProps) {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.heroCard}>
         <Text style={typography.eyebrow}>{tCourse('heroEyebrow')}</Text>
         <Text style={[typography.screenTitle, styles.title]}>{courseData?.title ?? courseTitle ?? courseCode}</Text>
@@ -274,21 +250,23 @@ export function CourseScreen({ userId }: CourseScreenProps) {
       </View>
 
       <View style={styles.metaRow}>
-        <View style={styles.metaCard}>
+        <Pressable style={styles.metaCard} onPress={goToReferenceSection}>
           <Text style={typography.statValue}>{courseCode}</Text>
           <Text style={[typography.statLabel, styles.statLabel]}>{tCourse('reference')}</Text>
-        </View>
-        <View style={styles.metaCard}>
-          <Text style={typography.statValue}>{courseData?.format ?? tCommon('na')}</Text>
-          <Text style={[typography.statLabel, styles.statLabel]}>{tCourse('format')}</Text>
-        </View>
-        <View style={styles.metaCard}>
-          <Text style={typography.statValue}>{courseData?.duration ?? tCommon('na')}</Text>
-          <Text style={[typography.statLabel, styles.statLabel]}>{tCourse('duration')}</Text>
-        </View>
+        </Pressable>
+        <Pressable style={styles.metaCard} onPress={goToCourseVideo}>
+          <Text style={styles.videoCta}>▶</Text>
+          <Text style={[typography.statLabel, styles.statLabel]}>{tCourse('video')}</Text>
+        </Pressable>
+        
       </View>
 
-      <View style={styles.sectionCard}>
+      <View
+        style={styles.sectionCard}
+        onLayout={(event) => {
+          objectiveSectionY.current = event.nativeEvent.layout.y;
+        }}
+      >
         <Text style={typography.eyebrowWarning}>{tCourse('objectiveEyebrow')}</Text>
         <Text style={styles.sectionBody}>{courseData?.objective ?? tCourse('objectiveUnavailable')}</Text>
       </View>
@@ -472,6 +450,12 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     marginTop: 6,
+  },
+  videoCta: {
+    color: colors.accent,
+    fontSize: 28,
+    fontWeight: '900',
+    lineHeight: 32,
   },
   sectionCard: {
     borderRadius: 16,
