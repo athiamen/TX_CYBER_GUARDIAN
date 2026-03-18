@@ -24,6 +24,9 @@
 | Backend | Base de données | Agrégats statistiques (attempts, averageSuccessRate) | SQL/ORM | Requêtes agrégées contrôlées |
 | Base de données | Backend | Entités métier + statistiques | Objets ORM | Contraintes + index |
 
+Bearer : Mode d'authentification par jeton
+ORM : Communication entre la base de données SQLLite et le backend assurée par Prisma (Node.js / TypeScript)
+
 ## Explication de l'architecture
 
 Cette architecture suit un modèle client-serveur en 4 blocs: interface utilisateur, applications mobiles, backend API et base de données.
