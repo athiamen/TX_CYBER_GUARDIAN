@@ -24,7 +24,7 @@
 | Backend | Base de donnees | Agregats statistiques (attempts, averageSuccessRate) | SQL/ORM | Requetes agregees controlees |
 | Base de donnees | Backend | Entites metier + statistiques | Objets ORM | Contraintes + index |
 
-## Diagramme Mermaid enrichi
+## Schéma d'architecture
 
 ```mermaid
 flowchart LR
