@@ -1,4 +1,28 @@
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+import { Platform } from 'react-native';
+
+const FALLBACK_API_BASE_URL =
+  Platform.OS === 'android' ? 'http://10.0.2.2:4000/api' : 'http://localhost:4000/api';
+
+function normalizeApiBaseUrl(baseUrl: string) {
+  if (Platform.OS !== 'android') {
+    return baseUrl;
+  }
+
+  try {
+    const parsed = new URL(baseUrl);
+    if (parsed.hostname === '127.0.0.1' || parsed.hostname === 'localhost') {
+      const mappedHost = `10.0.2.2${parsed.port ? `:${parsed.port}` : ''}`;
+      return `${parsed.protocol}//${mappedHost}${parsed.pathname}`.replace(/\/$/, '');
+    }
+  } catch {
+    return baseUrl;
+  }
+
+  return baseUrl;
+}
+
+const RAW_API_BASE_URL = (process.env.EXPO_PUBLIC_API_URL ?? FALLBACK_API_BASE_URL).replace(/\/$/, '');
+const API_BASE_URL = normalizeApiBaseUrl(RAW_API_BASE_URL);
 
 export type AuthUser = {
   id: string;
@@ -112,15 +136,22 @@ class ApiError extends Error {
 }
 
 async function request<T>(path: string, config: RequestConfig = {}): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    method: config.method ?? 'GET',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      ...(config.token ? { Authorization: `Bearer ${config.token}` } : {}),
-    },
-    body: config.body !== undefined ? JSON.stringify(config.body) : undefined,
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      method: config.method ?? 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        ...(config.token ? { Authorization: `Bearer ${config.token}` } : {}),
+      },
+      body: config.body !== undefined ? JSON.stringify(config.body) : undefined,
+    });
+  } catch (error) {
+    const details = error instanceof Error ? error.message : 'Network request failed';
+    throw new ApiError(`Impossible de joindre le backend (${API_BASE_URL}). ${details}`, 0);
+  }
 
   const rawBody = await response.text();
   let data: unknown = null;
@@ -137,7 +168,7 @@ async function request<T>(path: string, config: RequestConfig = {}): Promise<T> 
     const message =
       typeof data === 'object' && data !== null && 'message' in data && typeof (data as { message: unknown }).message === 'string'
         ? (data as { message: string }).message
-        : `HTTP ${response.status}`;
+        : `HTTP ${response.status} (${API_BASE_URL}${path})`;
     throw new ApiError(message, response.status);
   }
 
