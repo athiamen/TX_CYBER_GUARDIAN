@@ -1,5 +1,6 @@
 import type { TFunction } from 'i18next';
 import { QUIZ_CATALOG_BY_ID } from './quizCatalogData';
+import type { QuizDifficulty } from './quizCatalogData';
 
 export type QuizQuestion = {
   id: string;
@@ -16,16 +17,22 @@ export type QuizDefinition = {
   questions: QuizQuestion[];
 };
 
-export function getOrCreateQuiz(quizId: string | undefined, t: TFunction): QuizDefinition {
+export function getOrCreateQuiz(
+  quizId: string | undefined,
+  t: TFunction,
+  difficulty: QuizDifficulty = 'easy'
+): QuizDefinition {
   const fallbackId = quizId ?? 'Q1';
   const quizData = QUIZ_CATALOG_BY_ID[fallbackId];
 
   if (quizData) {
+    const questions = quizData.difficulties?.[difficulty] ?? quizData.questions ?? [];
+
     return {
       id: fallbackId,
       title: quizData.title,
       module: quizData.module,
-      questions: quizData.questions,
+      questions,
     };
   }
 

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import { getLearningProgress } from '../../../lib/learningProgress';
 import { ModulesStackParamList } from '../../../navigation/types';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
+import type { QuizDifficulty } from '../../quiz/data/quizCatalogData';
 
 type ModulesScreenProps = {
   userId: string;
@@ -16,6 +17,7 @@ type ModulesScreenProps = {
 export function ModulesScreen({ userId }: ModulesScreenProps) {
   const { t } = useTranslation();
   const tModules = (key: string, options?: Record<string, unknown>) => t(`modules.${key}`, options);
+  const { width } = useWindowDimensions();
 
   const navigation = useNavigation<NativeStackNavigationProp<ModulesStackParamList>>();
   const [tracks, setTracks] = useState<ModuleItem[]>([]);
@@ -25,6 +27,7 @@ export function ModulesScreen({ userId }: ModulesScreenProps) {
   const [readCourseCodes, setReadCourseCodes] = useState<string[]>([]);
   const [completedCourseCodes, setCompletedCourseCodes] = useState<string[]>([]);
   const [completedQuizCodes, setCompletedQuizCodes] = useState<string[]>([]);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<QuizDifficulty>('easy');
 
   useEffect(() => {
     let isMounted = true;
@@ -177,6 +180,13 @@ export function ModulesScreen({ userId }: ModulesScreenProps) {
     return Math.max(selectedModule.courses.length - selectedModuleCompletedCoursesCount, 0);
   }, [selectedModule, selectedModuleCompletedCoursesCount]);
 
+  const moduleColumns = width >= 760 ? 3 : width >= 560 ? 2 : 1;
+  const moduleCardWidth = moduleColumns === 3 ? '31.8%' : moduleColumns === 2 ? '48.8%' : '100%';
+  const courseColumns = width >= 1120 ? 3 : width >= 760 ? 2 : 1;
+  const courseCardWidth = courseColumns === 3 ? '31.8%' : courseColumns === 2 ? '48.8%' : '100%';
+  const quizColumns = width >= 760 ? 2 : 1;
+  const quizCardWidth = quizColumns === 2 ? '48.8%' : '100%';
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.heroCard}>
@@ -221,28 +231,34 @@ export function ModulesScreen({ userId }: ModulesScreenProps) {
       {!isLoading && !errorMessage && selectedModule ? (
         <>
           <Text style={[typography.sectionTitle, styles.sectionTitle]}>{tModules('availableModules')}</Text>
-          {tracks.map((track) => (
-            <Pressable
-              key={track.id}
-              style={[styles.moduleCard, selectedModule.id === track.id && styles.moduleCardActive]}
-              onPress={() => setSelectedModuleId(track.id)}
-            >
-              <View style={styles.moduleTopRow}>
-                <Text style={typography.cardCode}>{track.code}</Text>
-                <Text style={styles.moduleBadge}>
-                  {tModules('courseCount', { count: track.courses.length })} • {tModules('quizCount', { count: track.quizzes.length })}
+          <View style={styles.modulesGrid}>
+            {tracks.map((track) => (
+              <Pressable
+                key={track.id}
+                style={[
+                  styles.moduleCard,
+                  { width: moduleCardWidth },
+                  selectedModule.id === track.id && styles.moduleCardActive,
+                ]}
+                onPress={() => setSelectedModuleId(track.id)}
+              >
+                <View style={styles.moduleTopRow}>
+                  <Text style={typography.cardCode}>{track.code}</Text>
+                  <Text style={styles.moduleBadge}>
+                    {tModules('courseCount', { count: track.courses.length })} • {tModules('quizCount', { count: track.quizzes.length })}
+                  </Text>
+                </View>
+                <Text style={typography.cardTitle}>{track.title}</Text>
+                <Text style={typography.cardMeta}>{track.level}</Text>
+                <View style={styles.progressTrack}>
+                  <View style={[styles.progressFill, { width: `${moduleProgressById[track.id] ?? 0}%` }]} />
+                </View>
+                <Text style={[typography.progressLabel, styles.progressLabel]}>
+                  {tModules('moduleProgress', { value: moduleProgressById[track.id] ?? 0 })}
                 </Text>
-              </View>
-              <Text style={typography.cardTitle}>{track.title}</Text>
-              <Text style={typography.cardMeta}>{track.level}</Text>
-              <View style={styles.progressTrack}>
-                <View style={[styles.progressFill, { width: `${moduleProgressById[track.id] ?? 0}%` }]} />
-              </View>
-              <Text style={[typography.progressLabel, styles.progressLabel]}>
-                {tModules('moduleProgress', { value: moduleProgressById[track.id] ?? 0 })}
-              </Text>
-            </Pressable>
-          ))}
+              </Pressable>
+            ))}
+          </View>
 
           <View style={styles.coursesPanel}>
             <Text style={typography.eyebrow}>{tModules('coursePanelEyebrow')}</Text>
@@ -255,28 +271,30 @@ export function ModulesScreen({ userId }: ModulesScreenProps) {
               })}
             </Text>
 
-            {selectedModule.courses.map((course) => (
-              <View key={course.id} style={styles.courseItem}>
-                <View style={styles.itemInfoWrap}>
-                  <Text style={typography.cardCode}>{course.code}</Text>
-                  <Text style={styles.courseTitle}>{course.title}</Text>
-                  <Text style={styles.courseMeta}>{course.format} • {course.duration}</Text>
+            <View style={styles.coursesGrid}>
+              {selectedModule.courses.map((course) => (
+                <View key={course.id} style={[styles.courseItem, { width: courseCardWidth }]}>
+                  <View style={styles.itemInfoWrap}>
+                    <Text style={typography.cardCode}>{course.code}</Text>
+                    <Text style={styles.courseTitle}>{course.title}</Text>
+                    <Text style={styles.courseMeta}>{course.format} • {course.duration}</Text>
+                  </View>
+                  <Pressable
+                    style={styles.courseButton}
+                    onPress={() =>
+                      navigation.navigate('CourseDetails', {
+                        courseCode: course.code,
+                        courseTitle: course.title,
+                        moduleTitle: selectedModule.title,
+                        autoStart: true,
+                      })
+                    }
+                  >
+                    <Text style={styles.courseButtonText}>{tModules('startCourse')}</Text>
+                  </Pressable>
                 </View>
-                <Pressable
-                  style={styles.courseButton}
-                  onPress={() =>
-                    navigation.navigate('CourseDetails', {
-                      courseCode: course.code,
-                      courseTitle: course.title,
-                      moduleTitle: selectedModule.title,
-                      autoStart: true,
-                    })
-                  }
-                >
-                  <Text style={styles.courseButtonText}>{tModules('startCourse')}</Text>
-                </Pressable>
-              </View>
-            ))}
+              ))}
+            </View>
           </View>
 
           <View style={styles.quizPanel}>
@@ -288,59 +306,57 @@ export function ModulesScreen({ userId }: ModulesScreenProps) {
                 completed: completedInSelectedModule,
               })}
             </Text>
-            {!selectedModuleAllCoursesCompleted ? (
-              <Text style={styles.quizLockHint}>
-                {tModules('quizUnlockHint', { count: remainingCoursesToUnlockQuiz })}
-              </Text>
-            ) : null}
+            <View style={styles.quizGrid}>
+              {selectedModule.quizzes.map((quiz) => {
+                const isQuizCompleted = completedQuizCodes.includes(quiz.code);
+                const isQuizUnlocked = selectedModuleAllCoursesCompleted || isQuizCompleted;
 
-            {selectedModule.quizzes.map((quiz) => {
-              const isQuizCompleted = completedQuizCodes.includes(quiz.code);
-              const isQuizUnlocked = selectedModuleAllCoursesCompleted || isQuizCompleted;
-
-              return (
-                <View
-                  key={quiz.id}
-                  style={[
-                    styles.quizItem,
-                    isQuizCompleted && styles.quizItemCompleted,
-                    !isQuizUnlocked && styles.quizItemLocked,
-                  ]}
-                >
-                  <View style={styles.itemInfoWrap}>
-                    <Text style={typography.cardCode}>{quiz.code}</Text>
-                    <Text style={styles.quizTitle}>{quiz.title}</Text>
-                    <Text style={styles.quizMeta}>{quiz.duration}</Text>
-                    {isQuizCompleted ? <Text style={styles.quizDoneBadge}>{tModules('alreadyCompleted')}</Text> : null}
-                    {!isQuizUnlocked ? <Text style={styles.quizLockedBadge}>{tModules('locked')}</Text> : null}
-                  </View>
-                  <Pressable
+                return (
+                  <View
+                    key={quiz.id}
                     style={[
-                      styles.quizButton,
-                      isQuizCompleted && styles.quizButtonCompleted,
-                      !isQuizUnlocked && styles.quizButtonLocked,
+                      styles.quizItem,
+                      { width: quizCardWidth },
+                      isQuizCompleted && styles.quizItemCompleted,
+                      !isQuizUnlocked && styles.quizItemLocked,
                     ]}
-                    disabled={!isQuizUnlocked}
-                    onPress={() =>
-                      navigation.navigate('QuizDetails', {
-                        quizId: quiz.code,
-                        quizTitle: quiz.title,
-                      })
-                    }
                   >
-                    <Text
+                    <View style={styles.itemInfoWrap}>
+                      <Text style={typography.cardCode}>{quiz.code}</Text>
+                      <Text style={styles.quizTitle}>{quiz.title}</Text>
+                      <Text style={styles.quizMeta}>{quiz.duration}</Text>
+                      {isQuizCompleted ? <Text style={styles.quizDoneBadge}>{tModules('alreadyCompleted')}</Text> : null}
+                      {!isQuizUnlocked ? <Text style={styles.quizLockedBadge}>{tModules('locked')}</Text> : null}
+                    </View>
+                    <Pressable
                       style={[
-                        styles.quizButtonText,
-                        isQuizCompleted && styles.quizButtonTextCompleted,
-                        !isQuizUnlocked && styles.quizButtonTextLocked,
+                        styles.quizButton,
+                        isQuizCompleted && styles.quizButtonCompleted,
+                        !isQuizUnlocked && styles.quizButtonLocked,
                       ]}
+                      disabled={!isQuizUnlocked}
+                      onPress={() =>
+                        navigation.navigate('QuizDetails', {
+                          quizId: quiz.code,
+                          quizTitle: quiz.title,
+                          difficulty: selectedDifficulty,
+                        })
+                      }
                     >
-                      {isQuizCompleted ? tModules('resumeQuiz') : isQuizUnlocked ? tModules('startQuiz') : tModules('locked')}
-                    </Text>
-                  </Pressable>
-                </View>
-              );
-            })}
+                      <Text
+                        style={[
+                          styles.quizButtonText,
+                          isQuizCompleted && styles.quizButtonTextCompleted,
+                          !isQuizUnlocked && styles.quizButtonTextLocked,
+                        ]}
+                      >
+                        {isQuizCompleted ? tModules('resumeQuiz') : isQuizUnlocked ? tModules('startQuiz') : tModules('locked')}
+                      </Text>
+                    </Pressable>
+                  </View>
+                );
+              })}
+            </View>
           </View>
         </>
       ) : null}
@@ -376,8 +392,8 @@ const styles = StyleSheet.create({
   },
   heroImage: {
     width: 220,
-    maxWidth: '42%',
-    height: 140,
+    maxWidth: '50%',
+    height: 160,
     borderRadius: 12,
     resizeMode: 'cover',
   },
@@ -387,6 +403,8 @@ const styles = StyleSheet.create({
   heroBody: {
     marginTop: 10,
     maxWidth: 330,
+    textAlign: 'left',
+    fontWeight: 'bold',
   },
   statsRow: {
     flexDirection: 'row',
@@ -421,9 +439,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   errorText: {
-    color: '#ffb9b9',
+    color: colors.error,
     fontSize: 12,
     lineHeight: 18,
+  },
+  modulesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 10,
   },
   moduleCard: {
     gap: 4,
@@ -432,10 +456,11 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.surface,
     padding: 14,
+    minWidth: 220,
   },
   moduleCardActive: {
     borderColor: colors.accent,
-    backgroundColor: '#0f3a4b',
+    backgroundColor: colors.moduleCardActiveBg,
   },
   moduleTopRow: {
     flexDirection: 'row',
@@ -473,6 +498,12 @@ const styles = StyleSheet.create({
     padding: 14,
     gap: 10,
   },
+  coursesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
   coursesPanelTitle: {
     marginTop: -2,
   },
@@ -487,9 +518,9 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.surfaceSoft,
     padding: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
     gap: 10,
   },
   itemInfoWrap: {
@@ -514,6 +545,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 9,
+    alignSelf: 'flex-start',
   },
   courseButtonText: {
     color: colors.text,
@@ -539,9 +571,44 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
   },
+  quizGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  difficultySelector: {
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    gap: 8,
+    marginTop: 10,
+  },
+  difficultyButton: {
+    flex: 1,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceSoft,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  difficultyButtonActive: {
+    backgroundColor: colors.accent,
+  },
+  difficultyButtonText: {
+    color: colors.text,
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  difficultyButtonTextActive: {
+    color: colors.surface,
+  },
   quizLockHint: {
     marginTop: -2,
-    color: '#fbbf24',
+    color: colors.quizLockHint,
     fontSize: 12,
     fontWeight: '700',
     lineHeight: 18,
@@ -552,19 +619,19 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.surfaceSoft,
     padding: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
     gap: 10,
   },
   quizItemLocked: {
-    borderColor: '#36526a',
-    backgroundColor: '#102536',
+    borderColor: colors.quizItemLockedBorder,
+    backgroundColor: colors.quizItemLockedBg,
     opacity: 0.8,
   },
   quizItemCompleted: {
-    borderColor: '#34d399',
-    backgroundColor: '#123528',
+    borderColor: colors.quizItemCompletedBorder,
+    backgroundColor: colors.quizItemCompletedBg,
   },
   quizTitle: {
     color: colors.text,
@@ -583,9 +650,9 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: '#34d399',
-    color: '#86efac',
-    backgroundColor: '#0f2b21',
+    borderColor: colors.surface,
+    color: colors.surfaceSoft,
+    backgroundColor: colors.accent,
     paddingHorizontal: 8,
     paddingVertical: 4,
     fontSize: 11,
@@ -598,9 +665,9 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: '#7c8fa5',
-    color: '#c1cfdb',
-    backgroundColor: '#1d3446',
+    borderColor: colors.quizLockedBadgeBorder,
+    color: colors.quizLockedBadgeText,
+    backgroundColor: colors.quizLockedBadgeBg,
     paddingHorizontal: 8,
     paddingVertical: 4,
     fontSize: 11,
@@ -610,19 +677,20 @@ const styles = StyleSheet.create({
   },
   quizButton: {
     borderRadius: 10,
-    backgroundColor: colors.accent,
+    backgroundColor: colors.textMuted,
     paddingHorizontal: 12,
     paddingVertical: 9,
+    alignSelf: 'flex-start',
   },
   quizButtonLocked: {
-    backgroundColor: '#30485f',
+    backgroundColor: colors.quizButtonLockedBg,
     borderWidth: 1,
-    borderColor: '#486177',
+    borderColor: colors.quizButtonLockedBorder,
   },
   quizButtonCompleted: {
-    backgroundColor: '#1a4a3a',
+    backgroundColor: colors.quizButtonCompletedBg,
     borderWidth: 1,
-    borderColor: '#34d399',
+    borderColor: colors.quizButtonCompletedBorder,
   },
   quizButtonText: {
     color: colors.background,
@@ -632,9 +700,9 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   quizButtonTextCompleted: {
-    color: '#d1fae5',
+    color: colors.quizButtonCompletedText,
   },
   quizButtonTextLocked: {
-    color: '#c8d4df',
+    color: colors.quizButtonLockedText,
   },
 });

@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   heroImage: {
     width: 220,
     maxWidth: '42%',
-    height: 140,
+    height: 160,
     borderRadius: 14,
     resizeMode: 'cover',
   },

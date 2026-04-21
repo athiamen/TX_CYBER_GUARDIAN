@@ -8,6 +8,7 @@ export type QuizParams =
   | {
       quizId?: string;
       quizTitle?: string;
+      difficulty?: 'easy' | 'medium' | 'hard';
     }
   | undefined;
 

@@ -261,121 +261,133 @@ export function CourseScreen({ userId }: CourseScreenProps) {
         
       </View>
 
-      <View
-        style={styles.sectionCard}
-        onLayout={(event) => {
-          objectiveSectionY.current = event.nativeEvent.layout.y;
-        }}
-      >
-        <Text style={typography.eyebrowWarning}>{tCourse('objectiveEyebrow')}</Text>
-        <Text style={styles.sectionBody}>{courseData?.objective ?? tCourse('objectiveUnavailable')}</Text>
-      </View>
-
-      {courseStarted ? (
-        <>
-          <View style={styles.timelineCard}>
-            <View style={styles.timelineHeader}>
-              <Text style={typography.eyebrowWarning}>{tCourse('timelineEyebrow')}</Text>
-              <Text style={styles.timelineMeta}>
-                {tCourse('stepMeta', {
-                  current: Math.min(currentStep + 1, sections.length),
-                  total: sections.length,
-                })}
-              </Text>
-            </View>
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${courseCompleted ? 100 : progress}%` }]} />
-            </View>
-            <View style={styles.sectionPills}>
-              {sections.map((section, index) => (
-                <View key={section.id} style={[styles.sectionPill, index <= currentStep && styles.sectionPillActive]}>
-                  <Text style={[styles.sectionPillText, index <= currentStep && styles.sectionPillTextActive]}>{section.label}</Text>
-                </View>
-              ))}
+      <View style={styles.learningColumn}>
+        <View style={styles.learningColumnsRow}>
+          <View style={styles.learningColumnItem}>
+            <View
+              style={styles.sectionCard}
+              onLayout={(event) => {
+                objectiveSectionY.current = event.nativeEvent.layout.y;
+              }}
+            >
+              <Text style={typography.eyebrowWarning}>{tCourse('objectiveEyebrow')}</Text>
+              <Text style={styles.sectionBody}>{courseData?.objective ?? tCourse('objectiveUnavailable')}</Text>
             </View>
           </View>
 
-          {courseCompleted ? (
-            <View style={styles.sectionCard}>
-              <Text style={typography.eyebrowWarning}>{tCourse('completedEyebrow')}</Text>
-              <Text style={styles.completionValue}>100%</Text>
-              <Text style={styles.sectionBody}>
-                {tCourse('completedBody', {
-                  courseTitle: courseData?.title ?? courseTitle ?? courseCode,
-                })}
-              </Text>
-              <Pressable style={styles.startButton} onPress={restartCourse}>
-                <Text style={styles.startButtonText}>{tCourse('review')}</Text>
-              </Pressable>
-              {nextCourse ? (
-                <Pressable style={styles.completionNextButton} onPress={goToNextCourse}>
-                  <Text style={styles.completionNextButtonText}>
-                    {tCourse('nextCourse', { code: nextCourse.code })}
+          <View style={styles.learningColumnItem}>
+            {courseStarted ? (
+              <View style={styles.timelineCard}>
+                <View style={styles.timelineHeader}>
+                  <Text style={typography.eyebrowWarning}>{tCourse('timelineEyebrow')}</Text>
+                  <Text style={styles.timelineMeta}>
+                    {tCourse('stepMeta', {
+                      current: Math.min(currentStep + 1, sections.length),
+                      total: sections.length,
+                    })}
                   </Text>
-                </Pressable>
-              ) : null}
-            </View>
-          ) : (
-            <Animated.View
-              style={[
-                styles.sectionCard,
-                {
-                  opacity: fadeAnim,
-                  transform: [{ translateY: translateAnim }],
-                },
-              ]}
-            >
-              <Text style={typography.eyebrowWarning}>{activeSection.label}</Text>
-              <Text style={styles.stepTitle}>{activeSection.title}</Text>
-              <Text style={styles.sectionBody}>{activeSection.body}</Text>
-
-              <View style={styles.developmentCard}>
-                <Text style={styles.developmentLabel}>{tCourse('development')}</Text>
-                <View style={styles.developmentList}>
-                  {activeSection.development.map((paragraph) => (
-                    <Text key={paragraph} style={styles.developmentBody}>{paragraph}</Text>
-                  ))}
                 </View>
-              </View>
-
-              <View style={styles.keyPointCard}>
-                <Text style={styles.keyPointLabel}>{tCourse('takeaway')}</Text>
-                <View style={styles.takeawayList}>
-                  {activeSection.takeaway.map((item) => (
-                    <View key={item} style={styles.takeawayItem}>
-                      <View style={styles.takeawayBullet} />
-                      <Text style={styles.keyPointBody}>{item}</Text>
+                <View style={styles.progressTrack}>
+                  <View style={[styles.progressFill, { width: `${courseCompleted ? 100 : progress}%` }]} />
+                </View>
+                <View style={styles.sectionPills}>
+                  {sections.map((section, index) => (
+                    <View key={section.id} style={[styles.sectionPill, index <= currentStep && styles.sectionPillActive]}>
+                      <Text style={[styles.sectionPillText, index <= currentStep && styles.sectionPillTextActive]}>{section.label}</Text>
                     </View>
                   ))}
                 </View>
               </View>
-
-              <View style={styles.actionsRow}>
-                <Pressable
-                  style={[styles.secondaryButton, currentStep === 0 && styles.secondaryButtonDisabled]}
-                  onPress={goToPreviousStep}
-                  disabled={currentStep === 0}
-                >
-                  <Text style={styles.secondaryButtonText}>{tCourse('previous')}</Text>
-                </Pressable>
-                <Pressable style={styles.startButton} onPress={goToNextStep}>
-                  <Text style={styles.startButtonText}>
-                    {currentStep === sections.length - 1 ? tCourse('finishCourse') : tCourse('nextStep')}
-                  </Text>
+            ) : (
+              <View style={styles.sectionCard}>
+                <Text style={typography.eyebrowWarning}>{tCourse('startEyebrow')}</Text>
+                <Text style={styles.sectionBody}>{tCourse('startBody')}</Text>
+                <Pressable style={styles.startButton} onPress={startCourse}>
+                  <Text style={styles.startButtonText}>{tCourse('start')}</Text>
                 </Pressable>
               </View>
-            </Animated.View>
-          )}
-        </>
-      ) : (
-        <View style={styles.sectionCard}>
-          <Text style={typography.eyebrowWarning}>{tCourse('startEyebrow')}</Text>
-          <Text style={styles.sectionBody}>{tCourse('startBody')}</Text>
-          <Pressable style={styles.startButton} onPress={startCourse}>
-            <Text style={styles.startButtonText}>{tCourse('start')}</Text>
-          </Pressable>
+            )}
+          </View>
         </View>
-      )}
+
+        {courseStarted ? (
+          <>
+            {courseCompleted ? (
+              <View style={styles.sectionCard}>
+                <Text style={typography.eyebrowWarning}>{tCourse('completedEyebrow')}</Text>
+                <Text style={styles.completionValue}>100%</Text>
+                <Text style={styles.sectionBody}>
+                  {tCourse('completedBody', {
+                    courseTitle: courseData?.title ?? courseTitle ?? courseCode,
+                  })}
+                </Text>
+                <Pressable style={styles.startButton} onPress={restartCourse}>
+                  <Text style={styles.startButtonText}>{tCourse('review')}</Text>
+                </Pressable>
+                {nextCourse ? (
+                  <Pressable style={styles.completionNextButton} onPress={goToNextCourse}>
+                    <Text style={styles.completionNextButtonText}>
+                      {tCourse('nextCourse', { code: nextCourse.code })}
+                    </Text>
+                  </Pressable>
+                ) : null}
+              </View>
+            ) : (
+              <Animated.View
+                style={[
+                  styles.sectionCard,
+                  {
+                    opacity: fadeAnim,
+                    transform: [{ translateY: translateAnim }],
+                  },
+                ]}
+              >
+                <Text style={typography.eyebrowWarning}>{activeSection.label}</Text>
+                <Text style={styles.stepTitle}>{activeSection.title}</Text>
+                <Text style={styles.sectionBody}>{activeSection.body}</Text>
+
+                <View style={styles.validationInsightsColumn}>
+                  <View style={styles.developmentCard}>
+                    <Text style={styles.developmentLabel}>{tCourse('development')}</Text>
+                    <View style={styles.developmentList}>
+                      {activeSection.development.map((paragraph) => (
+                        <Text key={paragraph} style={styles.developmentBody}>{paragraph}</Text>
+                      ))}
+                    </View>
+                  </View>
+
+                  <View style={styles.keyPointCard}>
+                    <Text style={styles.keyPointLabel}>{tCourse('takeaway')}</Text>
+                    <View style={styles.takeawayList}>
+                      {activeSection.takeaway.map((item) => (
+                        <View key={item} style={styles.takeawayItem}>
+                          <View style={styles.takeawayBullet} />
+                          <Text style={styles.keyPointBody}>{item}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                </View>
+
+                <View style={styles.actionsRow}>
+                  <Pressable
+                    style={[styles.secondaryButton, currentStep === 0 && styles.secondaryButtonDisabled]}
+                    onPress={goToPreviousStep}
+                    disabled={currentStep === 0}
+                  >
+                    <Text style={styles.secondaryButtonText}>{tCourse('previous')}</Text>
+                  </Pressable>
+                  <Pressable style={styles.startButton} onPress={goToNextStep}>
+                    <Text style={styles.startButtonText}>
+                      {currentStep === sections.length - 1 ? tCourse('finishCourse') : tCourse('nextStep')}
+                    </Text>
+                  </Pressable>
+                </View>
+              </Animated.View>
+            )}
+          </>
+        ) : null}
+      </View>
     </ScrollView>
   );
 }
@@ -414,6 +426,8 @@ const styles = StyleSheet.create({
   },
   body: {
     marginTop: 10,
+    textAlign: 'left',
+    fontWeight: 'bold',
   },
   errorText: {
     marginTop: 8,
@@ -464,6 +478,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     padding: 14,
     gap: 8,
+  },
+  learningColumn: {
+    flexDirection: 'column',
+    gap: 14,
+  },
+  learningColumnsRow: {
+    flexDirection: 'row',
+    gap: 14,
+    alignItems: 'flex-start',
+  },
+  learningColumnItem: {
+    flex: 1,
   },
   timelineCard: {
     borderRadius: 16,
@@ -530,6 +556,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 21,
   },
+  validationInsightsColumn: {
+    flexDirection: 'row',
+    gap: 10,
+    height: '100%',
+    width: '100%',
+  },
   keyPointCard: {
     marginTop: 4,
     borderRadius: 12,
@@ -537,7 +569,8 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.surfaceSoft,
     padding: 12,
-    gap: 8,
+    gap: 10,
+    width: '50%',
   },
   developmentCard: {
     marginTop: 4,
@@ -547,9 +580,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceSoft,
     padding: 12,
     gap: 8,
+    width: '49%',
   },
   developmentLabel: {
-    color: colors.accent,
+    color: colors.development,
     fontSize: 12,
     fontWeight: '800',
     letterSpacing: 0.3,
