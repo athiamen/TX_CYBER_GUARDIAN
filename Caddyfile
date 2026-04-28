@@ -1,0 +1,3 @@
+http://cyber-guardian-app {
+	reverse_proxy app:8081
+}

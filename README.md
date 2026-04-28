@@ -77,7 +77,15 @@ Pour démarrer l'application web Expo dans un conteneur :
 docker compose up --build
 ```
 
-Le service expose l'interface web Expo et injecte `EXPO_PUBLIC_API_URL` avec `host.docker.internal` pour joindre un backend lancé sur la machine hôte sous Windows.
+L'application est ensuite disponible sur `http://cyber-guardian-app` si ce nom pointe vers `127.0.0.1` sur votre machine Windows.
+
+Ajoutez cette ligne dans `C:\Windows\System32\drivers\etc\hosts` si besoin :
+
+```text
+127.0.0.1 cyber-guardian-app
+```
+
+Le service `caddy` sert le site sur le port 80 et relaie vers le conteneur Expo. `EXPO_PUBLIC_API_URL` continue de viser le backend via `host.docker.internal`.
 
 Scripts disponibles:
 

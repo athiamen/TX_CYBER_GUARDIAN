@@ -10,6 +10,6 @@ RUN npm ci
 
 COPY . .
 
-EXPOSE 8081 19000 19001 19002 19006
+EXPOSE 8081
 
-CMD ["npm", "run", "web"]
+CMD ["npm", "run", "web", "--", "--host", "lan", "--port", "8081"]
