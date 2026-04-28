@@ -1,0 +1,13 @@
+node_modules
+.expo
+dist
+web-build
+.git
+.gitignore
+.env
+.env.*
+npm-debug.log
+yarn-error.log
+*.tsbuildinfo
+android
+ios

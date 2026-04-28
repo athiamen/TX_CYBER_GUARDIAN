@@ -69,6 +69,16 @@ Fichiers concernes:
 npm run start
 ```
 
+## Lancer avec Docker
+
+Pour démarrer l'application web Expo dans un conteneur :
+
+```bash
+docker compose up --build
+```
+
+Le service expose l'interface web Expo et injecte `EXPO_PUBLIC_API_URL` avec `host.docker.internal` pour joindre un backend lancé sur la machine hôte sous Windows.
+
 Scripts disponibles:
 
 - npm run start: demarre Expo

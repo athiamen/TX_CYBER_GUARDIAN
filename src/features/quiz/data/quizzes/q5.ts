@@ -2,12 +2,12 @@ import { q, type QuizCatalogEntry } from './types';
 
 export const QUIZ_Q5: QuizCatalogEntry = {
   title: 'Le Labyrinthe des Infos',
-  module: 'Protection des donnees personnelles',
+  module: 'Protection des données personnelles',
   questions: [
-    q('Q5-1', 'Donnees personnelles', 'Quel element fait partie des mecaniques du Labyrinthe des Infos ?', ['Compilation de code en temps reel', 'Mode multijoueur en equipe reseau', 'Inventaire des donnees sensibles protegees/compromises'], 2),
-    q('Q5-2', 'Donnees personnelles', 'Quel bilan final peut apparaitre dans ce jeu ?', ['Maitre de la cybersecurite', 'Administrateur systeme certifie', 'Root kernel valide'], 0),
-    q('Q5-3', 'Donnees personnelles', 'Combien de vies le joueur a-t-il au depart ?', ['2', '5', '10'], 1),
-    q('Q5-4', 'Donnees personnelles', 'Quelle situation est presentee dans le labyrinthe ?', ['Une mise a jour BIOS', 'Une panne de clavier', 'Un faux concours iPhone'], 2),
-    q('Q5-5', 'Donnees personnelles', 'Quelle donnee faut-il proteger dans ce jeu ?', ['Adresse et numero de telephone', 'Couleur preferee seulement', 'Nom du dessin anime prefere'], 0),
+    q('Q5-1', 'Données personnelles', 'Quel élément fait partie des mécaniques du Labyrinthe des Infos ?', ['Compilation de code en temps réel', 'Mode multijoueur en équipe réseau', 'Inventaire des données sensibles protégées/compromises'], 2),
+    q('Q5-2', 'Données personnelles', 'Quel bilan final peut apparaître dans ce jeu ?', ['Maître de la cybersécurité', 'Administrateur système certifié', 'Root kernel valide'], 0),
+    q('Q5-3', 'Données personnelles', 'Combien de vies le joueur a-t-il au départ ?', ['2', '5', '10'], 1),
+    q('Q5-4', 'Données personnelles', 'Quelle situation est présentée dans le labyrinthe ?', ['Une mise à jour BIOS', 'Une panne de clavier', 'Un faux concours iPhone'], 2),
+    q('Q5-5', 'Données personnelles', 'Quelle donnée faut-il protéger dans ce jeu ?', ['Adresse et numéro de téléphone', 'Couleur préférée seulement', 'Nom du dessin animé préféré'], 0),
   ],
 };

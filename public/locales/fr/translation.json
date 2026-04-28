@@ -98,7 +98,7 @@
     "finishCourse": "Terminer le cours",
     "nextStep": "Etape suivante",
     "startEyebrow": "DÉMARRAGE",
-    "startBody": "Le cours n a pas encore commencé. Appuyez sur le bouton ci-dessous pour lancer le parcours animé et suivre les étapes une à une.",
+    "startBody": "Le cours n'a pas encore commencé. Appuyez sur le bouton ci-dessous pour lancer le parcours animé et suivre les étapes une à une.",
     "start": "Commencer le cours"
   },
   "quiz": {
@@ -127,8 +127,8 @@
     "nextQuestion": "Question suivante",
     "noQuestion": "Aucune question disponible pour ce quiz.",
     "answerExplanation": {
-      "correct": "Bonne reponse. \"{{correctOption}}\" est correcte car elle correspond au bon reflexe de cybersecurite attendu pour cette situation.",
-      "wrong": "Mauvaise reponse. \"{{selectedOption}}\" n est pas la bonne action ici. La bonne reponse est \"{{correctOption}}\" car c est le comportement le plus sur dans ce contexte."
+      "correct": "Bonne réponse. \"{{correctOption}}\" est correcte car elle correspond au bon reflexe de cybersecurité attendu pour cette situation.",
+      "wrong": "Mauvaise réponse. \"{{selectedOption}}\" n'est pas la bonne action ici. La bonne réponse est \"{{correctOption}}\" car c'est le comportement le plus sûr dans ce contexte."
     },
     "fallback": {
       "title": "Quiz {{id}}",
