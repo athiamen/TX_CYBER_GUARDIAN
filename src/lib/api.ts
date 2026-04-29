@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 
 const FALLBACK_API_BASE_URL =
-  Platform.OS === 'android' ? 'http://10.0.2.2:4000/api' : 'http://localhost:4000/api';
+  Platform.OS === 'android' ? 'http://10.0.2.2:4000/api' : 'http://cyber-guardian-app:4000/api';
 
 function normalizeApiBaseUrl(baseUrl: string) {
   if (Platform.OS !== 'android') {
@@ -10,7 +10,7 @@ function normalizeApiBaseUrl(baseUrl: string) {
 
   try {
     const parsed = new URL(baseUrl);
-    if (parsed.hostname === '127.0.0.1' || parsed.hostname === 'localhost') {
+    if (parsed.hostname === '127.0.0.1' || parsed.hostname === 'localhost' || parsed.hostname === 'cyber-guardian-app') {
       const mappedHost = `10.0.2.2${parsed.port ? `:${parsed.port}` : ''}`;
       return `${parsed.protocol}//${mappedHost}${parsed.pathname}`.replace(/\/$/, '');
     }

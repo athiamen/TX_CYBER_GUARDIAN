@@ -3,9 +3,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: cyber-guardian-app
+    hostname: cyber-guardian-app
     environment:
       EXPO_NO_TELEMETRY: "1"
-      EXPO_PUBLIC_API_URL: http://host.docker.internal:4000/api
+      EXPO_PUBLIC_API_URL: ${BACKEND_URL:-http://host.docker.internal:4000/api}
     volumes:
       - .:/app
       - /app/node_modules
